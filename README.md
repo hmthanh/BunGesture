@@ -1,2 +1,2 @@
 # BunGesture
-BunGesture - gesture generation model for Vietnamese
+BunGesture - Diffusion-base gesture generation model for Vietnamese
