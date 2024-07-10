@@ -1,2 +1,2 @@
-# bunGesture
-bún Gesture - gesture generation model for Vietnamese
+# BunGesture
+BunGesture - gesture generation model for Vietnamese
