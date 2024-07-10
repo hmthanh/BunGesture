@@ -75,7 +75,7 @@ def inference(args, save_dir, prefix, textaudio, sample_fn, model, n_frames=0, s
     data_std = np.array(data_std_)
     # std = np.clip(data_std, a_min=0.01, a_max=None)
     if args.name == 'DiffuseStyleGesture++':
-        gesture_flag1 = np.load("../../BEAT_dataset/processed/" + 'gesture_BEAT' + "/2_scott_0_1_1.npy")[:args.n_seed + 2]
+        gesture_flag1 = np.load("./dataset/BEAT/processed/" + 'gesture_BEAT' + "/2_scott_0_1_1.npy")[:args.n_seed + 2]
         gesture_flag1 = (gesture_flag1 - data_mean) / data_std
         gesture_flag1_vel = gesture_flag1[1:] - gesture_flag1[:-1]
         gesture_flag1_acc = gesture_flag1_vel[1:] - gesture_flag1_vel[:-1]
@@ -103,9 +103,9 @@ def inference(args, save_dir, prefix, textaudio, sample_fn, model, n_frames=0, s
             if dataset == 'BEAT':
 
                 if speaker == 2:
-                    seed_gesture = np.load("../../BEAT_dataset/processed/" + 'gesture_BEAT' + "/2_scott_0_1_1.npy")[:args.n_seed + 2]  # any speaker, here we only use seed pose of 2_scott_0_1_1.npy
+                    seed_gesture = np.load("./dataset/BEAT/processed/" + 'gesture_BEAT' + "/2_scott_0_1_1.npy")[:args.n_seed + 2]  # any speaker, here we only use seed pose of 2_scott_0_1_1.npy
                 elif speaker == 10:
-                    seed_gesture = np.load("../../BEAT_dataset/processed/" + 'gesture_BEAT' + "/10_kieks_0_95_95.npy")[:args.n_seed + 2]
+                    seed_gesture = np.load("./dataset/BEAT/processed/" + 'gesture_BEAT' + "/10_kieks_0_95_95.npy")[:args.n_seed + 2]
                 else:
                     raise NotImplementedError
 

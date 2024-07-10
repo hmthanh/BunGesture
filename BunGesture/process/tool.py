@@ -9,7 +9,11 @@ import pdb
 
 import librosa
 import librosa.display
-from essentia.standard import *
+import essentia
+import essentia.standard as es
+# import essentia.standard
+# from essentia import *
+# from essentia.standard import *
 from pydub import AudioSegment
 import parselmouth as pm
 import os
@@ -17,8 +21,8 @@ import numpy as np
 import scipy
 
 NFFT = 4096
-MFCC_INPUTS = 40 # How many features we will store for each MFCC vector
-HOP_LENGTH = 1/30
+MFCC_INPUTS = 40  # How many features we will store for each MFCC vector
+HOP_LENGTH = 1 / 30
 DIM = 64
 
 
@@ -81,7 +85,6 @@ def create_bvh(filename, prediction, frame_time):
 
 
 def shorten(arr1, arr2, min_len=0):
-
     if min_len == 0:
         min_len = min(len(arr1), len(arr2))
 
@@ -99,7 +102,7 @@ def average(arr, n):
     Returns:
         resulting array
     """
-    end = n * int(len(arr)/n)
+    end = n * int(len(arr) / n)
     return np.mean(arr[:end].reshape(-1, n), 1)
 
 
@@ -112,7 +115,6 @@ def calculate_spectrogram(audio, sr):
         log spectrogram values
     """
 
-
     # Make stereo audio being mono
     if len(audio.shape) == 2:
         audio = (audio[:, 0] + audio[:, 1]) / 2
@@ -123,7 +125,7 @@ def calculate_spectrogram(audio, sr):
 
     # Shift into the log scale
     eps = 1e-10
-    log_spectr = np.log(abs(spectr)+eps)
+    log_spectr = np.log(abs(spectr) + eps)
 
     return np.transpose(log_spectr)
 
@@ -143,7 +145,7 @@ def calculate_mfcc(audio, sr):
 
     # Calculate MFCC feature with the window frame it was designed for
     input_vectors = librosa.feature.mfcc(y=audio, sr=sr, n_mfcc=MFCC_INPUTS, n_fft=NFFT, hop_length=int(HOP_LENGTH * sr),
-                                            n_mels=DIM)
+                                         n_mels=DIM)
 
     return input_vectors.transpose()
 
@@ -183,7 +185,7 @@ def extract_prosodic_features(audio_filename):
     pitch_der = pitch_der[:min_size]
 
     # Stack them all together
-    pros_feature = np.stack((energy, energy_der, pitch, pitch_der))#, pitch_ind))
+    pros_feature = np.stack((energy, energy_der, pitch, pitch_der))  # , pitch_ind))
 
     # And reshape
     pros_feature = np.transpose(pros_feature)
@@ -216,34 +218,34 @@ def compute_prosody(audio_filename, time_step=0.05):
 
     return pitch_norm, intensity_norm
 
-def extract_onsets(wav_path):
 
+def extract_onsets(wav_path):
     # Load audio file.
-    audio = MonoLoader(filename=wav_path, sampleRate=16000)()
+    audio = es.MonoLoader(filename=wav_path, sampleRate=16000)()
 
     # 1. Compute the onset detection function (ODF).
 
     # The OnsetDetection algorithm provides various ODFs.
-    od_hfc = OnsetDetection(method='hfc', sampleRate=16000)
+    od_hfc = es.OnsetDetection(method='hfc', sampleRate=16000)
     # od_complex = OnsetDetection(method='complex', sampleRate=16000)
 
     # We need the auxilary algorithms to compute magnitude and phase.
-    w = Windowing(type='hann')
-    fft = FFT()  # Outputs a complex FFT vector.
-    c2p = CartesianToPolar()  # Converts it into a pair of magnitude and phase vectors.
+    w = es.Windowing(type='hann')
+    fft = es.FFT()  # Outputs a complex FFT vector.
+    c2p = es.CartesianToPolar()  # Converts it into a pair of magnitude and phase vectors.
 
     # Compute both ODF frame by frame. Store results to a Pool.
     pool = essentia.Pool()
-    for frame in FrameGenerator(audio, frameSize=1024, hopSize=512):
+    for frame in es.FrameGenerator(audio, frameSize=1024, hopSize=512):
         magnitude, phase = c2p(fft(w(frame)))
         pool.add('odf.hfc', od_hfc(magnitude, phase))
         # pool.add('odf.complex', od_complex(magnitude, phase))
 
     # 2. Detect onset locations.
-    onsets = Onsets(frameRate=16000.0/512.0, silenceThreshold=0.04)     # default frameRate 44100/512=86.1328, silenceThreshold=0.02
+    onsets = es.Onsets(frameRate=16000.0 / 512.0, silenceThreshold=0.04)  # default frameRate 44100/512=86.1328, silenceThreshold=0.02
 
     # This algorithm expects a matrix, not a vector.
-    onsets_hfc = onsets(essentia.array([pool['odf.hfc']]), [1])        # frameRate 44100/512=86.1328
+    onsets_hfc = onsets(essentia.array([pool['odf.hfc']]), [1])  # frameRate 44100/512=86.1328
     # You need to specify weights, but if we use only one ODF
     # it doesn't actually matter which weight to give it
 
@@ -256,7 +258,7 @@ def extract_onsets(wav_path):
     # Add them to a silent audio and use the original audio as another channel. Mux both into a stereo signal.
     silence = [0.] * len(audio)
 
-    beeps_hfc = AudioOnsetsMarker(onsets=onsets_hfc, type='beep', sampleRate=16000)(silence)
+    beeps_hfc = es.AudioOnsetsMarker(onsets=onsets_hfc, type='beep', sampleRate=16000)(silence)
     # beeps_complex = AudioOnsetsMarker(onsets=onsets_complex, type='beep')(silence)
 
     # audio_hfc = StereoMuxer()(audio, beeps_hfc)
@@ -292,7 +294,7 @@ def extract_onsets(wav_path):
     #
     # plt.savefig(temp_dir + '/onset_detection.png')
 
-    audio_hfc = StereoMuxer()(silence, beeps_hfc)       # y = audio_hfc[:, 1]
+    audio_hfc = es.StereoMuxer()(silence, beeps_hfc)  # y = audio_hfc[:, 1]
 
     # AudioWriter(filename=temp_dir+ '/hiphop_onsets_hfc_stereo_.mp3', format='mp3', sampleRate=16000)(audio_hfc)
 
