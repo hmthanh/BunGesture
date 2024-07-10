@@ -1,0 +1,45 @@
+[tool.poetry]
+name = "bungesture"
+version = "0.1.0"
+description = "Diffusion-base gesture generation for Vietnamese language"
+authors = ["Thanh Hoang-Minh <hmthanhgm@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+pydub = "^0.25.1"
+praat-parselmouth = "^0.4.3"
+essentia = "^2.1b6.dev1177"
+textgrid = "^1.6.1"
+h5py = "^3.11.0"
+torch = "^2.3.1"
+torchvision = "^0.18.1"
+torchaudio = "^2.3.1"
+numpy = "^2.0.0"
+lmdb = "^1.5.1"
+pyarrow = "^16.1.0"
+pyyaml = "^6.0.1"
+easydict = "^1.13"
+configargparse = "^1.7"
+tensorboard = "^2.17.0"
+einops = "^0.8.0"
+matplotlib = "^3.9.1"
+tqdm = "^4.66.4"
+torchsnooper = "^0.8"
+ema-pytorch = "^0.5.1"
+soundfile = "^0.12.1"
+pandas = "^2.2.2"
+transforms3d = "^0.4.2"
+scipy = "^1.14.0"
+scikit-learn = "^1.5.1"
+librosa = "^0.10.2.post1"
+omegaconf = "^2.3.0"
+sox = "^1.5.0"
+rich = "^13.7.1"
+ffmpeg-normalize = "^1.28.2"
+blobfile = "^2.1.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
