@@ -220,11 +220,11 @@ def main(args, save_dir, model_path, tst_path=None, max_len=0, skip_timesteps=0,
             print(f"Processing: {filename}")
             if dataset == 'BEAT':
                 speaker_id = speaker_id_dict[int(filename.split('_')[0])]
-                speaker = np.zeros([args.style_dim])
+                speaker = np.array(np.zeros([args.style_dim]))
                 speaker[speaker_id] = 1
             elif dataset == 'TWH':
                 _, speaker_id = metadict_byfname[filename]
-                speaker = np.zeros([17])
+                speaker = np.array(np.zeros([17]))
                 speaker[speaker_id] = 1
 
             audio_path = os.path.join(tst_audio_dir, filename + '.npy')
