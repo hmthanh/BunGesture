@@ -5,6 +5,9 @@ description = "Diffusion-base gesture generation for Vietnamese language"
 authors = ["Thanh Hoang-Minh <hmthanhgm@gmail.com>"]
 readme = "README.md"
 
+[tool.poetry.scripts]
+start = "bungesture.main:main"
+
 [tool.poetry.dependencies]
 python = "^3.11"
 pydub = "^0.25.1"
