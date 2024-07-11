@@ -107,9 +107,7 @@ def process_bvh(gesture_filename):
 
 def pose2bvh_bugfix(save_path, filename_prefix, poses, pipeline='./resource/data_pipe_30fps.sav'):
     writer = BVHWriter()
-    print("pipeline", pipeline)
     pipeline_path = os.path.join(os.getcwd(), pipeline)
-    print("pipeline_path", pipeline_path)
     pipeline = jl.load(pipeline)
 
     # smoothing

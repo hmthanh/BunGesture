@@ -1,2 +1,11 @@
 .DS_Store
 BunGesture/mydiffusion_beat_twh/BEAT_mymodel4_512_v0/model001080000.pt
+*.zip
+*.tar.gz
+*.tar
+*.gz
+*.log
+*.peaks
+*.pyc
+temp/
+

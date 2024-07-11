@@ -2,11 +2,6 @@ import sys, os, logging
 import pyfbsdk
 
 # Customs
-# MoBu env
-my_env = 'C:/Users/94086/.conda/envs/zeggs/Lib/site-packages'
-sys.path.append(my_env)
-
-
 # import numpy as np
 
 logging.basicConfig(
