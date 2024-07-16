@@ -66,7 +66,8 @@ def load_bvh(bvhfile, dump_pipeline=False, mode='expmap'):
         return out_data
 
 
-def wavlm_init(wavlm_model_path, device=torch.device('cuda:0')):
+# def wavlm_init(wavlm_model_path, device=torch.device('cuda:0')):
+def wavlm_init(wavlm_model_path, device=torch.device('mps')):
     import sys
     [sys.path.append(i) for i in ['./WavLM', '../process/WavLM']]
     from WavLM import WavLM, WavLMConfig
@@ -79,7 +80,8 @@ def wavlm_init(wavlm_model_path, device=torch.device('cuda:0')):
     return model, cfg
 
 
-def wav2wavlm(model, wav_input_16khz, cfg, device=torch.device('cuda:0')):
+# def wav2wavlm(model, wav_input_16khz, cfg, device=torch.device('cuda:0')):
+def wav2wavlm(model, wav_input_16khz, cfg, device=torch.device('mps')):
     with torch.no_grad():
         wav_input_16khz = wav_input_16khz.to(device)
         if cfg.normalize:

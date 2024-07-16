@@ -246,7 +246,7 @@ def main(args, save_dir, model_path, tst_path=None, max_len=0, skip_timesteps=0,
         wavlm_model, cfg = wavlm_init(wavlm_path, mydevice)
         word2vector = load_wordvectors(fname=word2vector_path)
 
-        wav = load_audio(wav_path, wavlm_model, cfg)
+        wav = load_audio(wav_path, wavlm_model, cfg, device=mydevice)
         clip_len = wav.shape[0]
         tsv = load_tsv(txt_path, word2vector, clip_len)
         textaudio = np.concatenate((wav, tsv), axis=-1)
