@@ -1,5 +1,12 @@
+# MacOS
 .DS_Store
-BunGesture/mydiffusion_beat_twh/BEAT_mymodel4_512_v0/model001080000.pt
+
+# Model
+/BunGesture/mydiffusion_beat_twh/BEAT_mymodel4_512_v0/model001080000.pt
+/BunGesture/mydiffusion_beat_twh/TWH_mymodel4_512_v0/model001200000.pt
+
+
+# File extension
 *.zip
 *.tar.gz
 *.tar
@@ -8,4 +15,3 @@ BunGesture/mydiffusion_beat_twh/BEAT_mymodel4_512_v0/model001080000.pt
 *.peaks
 *.pyc
 temp/
-

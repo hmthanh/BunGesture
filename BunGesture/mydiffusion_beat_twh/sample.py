@@ -110,7 +110,7 @@ def inference(args, save_dir, prefix, textaudio, sample_fn, model, n_frames=0, s
                     raise NotImplementedError
 
             elif dataset == 'TWH':
-                seed_gesture = np.load("../../TWH_dataset/processed/" + 'gesture_TWH' + "/val_2023_v0_014_main-agent.npy")[:args.n_seed + 2]
+                seed_gesture = np.load("../dataset/TWH/processed/" + 'gesture_TWH' + "/val_2023_v0_014_main-agent.npy")[:args.n_seed + 2]
 
             seed_gesture = (seed_gesture - data_mean) / data_std
             seed_gesture_vel = seed_gesture[1:] - seed_gesture[:-1]
