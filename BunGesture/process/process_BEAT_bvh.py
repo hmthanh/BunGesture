@@ -248,7 +248,6 @@ def load_tsv_unclipped(tsvfile):
 
 def load_tsv(tsvpath, word2vector, clip_len):
     # Align txt with audio
-
     sentence = load_tsv_unclipped(tsvpath)
     textfeatures = np.zeros([clip_len, 300 + 1])
     textfeatures[:, -1] = 1
