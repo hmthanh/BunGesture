@@ -1,18 +1,20 @@
 import sys
-
-[sys.path.append(i) for i in ['.', '..', '../process', '../model']]
-from model.mdm import MDM
-from utils.model_util import create_gaussian_diffusion, load_model_wo_clip
+import argparse
 import copy
+import os
 import numpy as np
 import yaml
+import math
 import torch
 from easydict import EasyDict
-import math
+
+from model.mdm import MDM
+from utils.model_util import create_gaussian_diffusion, load_model_wo_clip
 from process_BEAT_bvh import pose2bvh, pose2bvh_bugfix
 from process_TWH_bvh import pose2bvh as pose2bvh_twh
 from process_TWH_bvh import wavlm_init, load_metadata
-import argparse
+
+[sys.path.append(i) for i in ['.', '..', '../process', '../model']]
 
 speaker_id_dict = {
     2: 0,
@@ -55,9 +57,10 @@ def inference(args, save_dir, prefix, textaudio, sample_fn, model, n_frames=0, s
         n_frames = num_subdivision * stride_poses
         print('real_n_frames: {}, num_subdivision: {}, stride_poses: {}, n_frames: {}, speaker_id: {}'.format(real_n_frames, num_subdivision, stride_poses, n_frames, np.where(style == np.max(style))[0][0]))
 
+    style_array = np.array([style])
     model_kwargs_ = {'y': {}}
     model_kwargs_['y']['mask'] = (torch.zeros([1, 1, 1, args.n_poses]) < 1).to(mydevice)
-    model_kwargs_['y']['style'] = torch.as_tensor([style]).float().to(mydevice)
+    model_kwargs_['y']['style'] = torch.as_tensor(style_array).float().to(mydevice)
     model_kwargs_['y']['mask_local'] = torch.ones(1, args.n_poses).bool().to(mydevice)
 
     textaudio_pad = torch.zeros([n_frames - real_n_frames, args.audio_feature_dim]).to(mydevice)
@@ -101,7 +104,6 @@ def inference(args, save_dir, prefix, textaudio, sample_fn, model, n_frames=0, s
             # model_kwargs_['y']['seed'] = torch.zeros([1, args.njoints, 1, args.n_seed]).to(mydevice)
 
             if dataset == 'BEAT':
-
                 if speaker == 2:
                     seed_gesture = np.load("../dataset/BEAT/processed/" + 'gesture_BEAT' + "/2_scott_0_1_1.npy")[:args.n_seed + 2]  # any speaker, here we only use seed pose of 2_scott_0_1_1.npy
                 elif speaker == 10:
@@ -265,9 +267,9 @@ if __name__ == '__main__':
     '''
     parser = argparse.ArgumentParser(description='DiffuseStyleGesture')
     parser.add_argument('--config', default='./configs/DiffuseStyleGesture.yml')
-    parser.add_argument('--gpu', type=str, default='0')
+    parser.add_argument('--gpu', type=str, default='mps')
     parser.add_argument('--tst_prefix', nargs='+')
-    parser.add_argument('--no_cuda', type=list, default=['0'])
+    # parser.add_argument('--no_cuda', type=list, default=['0'])
     parser.add_argument('--model_path', type=str, default='./model000450000.pt')
     parser.add_argument('--tst_path', type=str, default=None)
     parser.add_argument('--wav_path', type=str, default=None)
@@ -316,11 +318,10 @@ if __name__ == '__main__':
         raise NotImplementedError
 
     # device_name = 'cuda:' + args.gpu
-    device_name = "mps"
-    import os
+    device_name = config.gpu  # mps || cuda:0
 
-    # mydevice = torch.device('cuda:' + config.gpu)
-    mydevice = torch.device("mps")
+    mydevice = torch.device(config.gpu)
+    # mydevice = torch.device("mps")
     # torch.cuda.set_device(int(config.gpu))
     # args.no_cuda = args.gpu
 

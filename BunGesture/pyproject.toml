@@ -9,7 +9,7 @@ readme = "README.md"
 start = "bungesture.main:main"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.12"
 pydub = "^0.25.1"
 praat-parselmouth = "^0.4.3"
 essentia = "^2.1b6.dev1177"

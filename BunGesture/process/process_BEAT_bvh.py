@@ -16,13 +16,13 @@ from scipy.spatial.transform import Rotation as R
 import torch.nn.functional as F
 import joblib as jl
 import textgrid
-from utils.data_utils import SubtitleWrapper, normalize_string
 import csv
 import io
 from tqdm import tqdm
 import string
 import h5py
 
+from utils.data_utils import SubtitleWrapper, normalize_string
 from anim import bvh, quat, txform
 from beat_data_proc.MyBVH import load_bvh_data
 from scipy.spatial.transform import Rotation
