@@ -17,7 +17,6 @@ def main(dataset, version):
 
 
 if __name__ == '__main__':
-
     parser = argparse.ArgumentParser(description='calculate_gesture_statistics.py')
     parser.add_argument('--dataset', type=str, default='BEAT')
     parser.add_argument('--version', type=str, default='v0')
