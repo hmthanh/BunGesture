@@ -1,7 +1,7 @@
 import torch
 import h5py
 import numpy as np
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset, Sampler
 import pdb
 import os
 
@@ -12,7 +12,7 @@ speaker_id_dict = {
 }
 
 
-class SpeechGestureDataset(torch.utils.data.Dataset):
+class SpeechGestureDataset(Dataset):
     def __init__(self, h5file, motion_dim, style_dim, sequence_length=30*5, npy_root="../../process", 
                  version='v0', dataset='BEAT'):
         self.h5 = h5py.File(h5file, "r")
@@ -68,7 +68,7 @@ class SpeechGestureDataset(torch.utils.data.Dataset):
         return textaudio, gesture, speaker
 
 
-class RandomSampler(torch.utils.data.Sampler):
+class RandomSampler(Sampler):
     def __init__(self, min_id, max_id):
         self.min_id = min_id
         self.max_id = max_id
@@ -77,7 +77,7 @@ class RandomSampler(torch.utils.data.Sampler):
             yield np.random.randint(self.min_id, self.max_id)
 
 
-class SequentialSampler(torch.utils.data.Sampler):
+class SequentialSampler(Sampler):
     def __init__(self, min_id, max_id):
         self.min_id = min_id
         self.max_id = max_id
@@ -92,9 +92,10 @@ if __name__ == '__main__':
     '''
     # Get data, data loaders and collate function ready
     print("Loading dataset into memory ...")
-    trn_dataset = SpeechGestureDataset("../../process/speaker_2_10_v0.h5", motion_dim=684, style_dim=2)
+    # trn_dataset = SpeechGestureDataset("../process/speaker_2_10_v0.h5", motion_dim=684, style_dim=2)
+    trn_dataset = SpeechGestureDataset("../../process/BEAT_v0.h5", motion_dim=684, style_dim=2)
 
-    train_loader = DataLoader(trn_dataset, num_workers=4,
+    train_loader = DataLoader(trn_dataset, num_workers=0,
                               sampler=RandomSampler(0, len(trn_dataset)),
                               batch_size=128,
                               pin_memory=True,

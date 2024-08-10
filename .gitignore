@@ -20,3 +20,4 @@ temp/
 *.npz
 .vscode/
 BunGesture/train\ data/
+BunGesture/data/

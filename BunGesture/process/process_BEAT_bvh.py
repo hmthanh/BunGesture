@@ -45,7 +45,7 @@ target_joints = ['Spine', 'Spine1', 'Spine2', 'Spine3', 'Neck', 'Neck1', 'Head',
                  'RightUpLeg', 'RightLeg', 'RightFoot', 'RightForeFoot', 'RightToeBase', 'RightToeBaseEnd',
                  'LeftUpLeg', 'LeftLeg', 'LeftFoot', 'LeftForeFoot', 'LeftToeBase', 'LeftToeBaseEnd']
 
-order = 'XYZ'       # 'XYZ', 'ZXY'
+order = 'XYZ'  # 'XYZ', 'ZXY'
 
 
 # print(len(target_joints))       # 74
@@ -340,7 +340,7 @@ def process_T_pose(base_path):
                     line[5] = str(0.0 - float(line[5]))
                     for j in range(2 + 6, len(line), 3):
                         line[j] = str(0.0 - float(line[j]))
-                        line[j-2] = str(0.0 - float(line[j-2]))
+                        line[j - 2] = str(0.0 - float(line[j - 2]))
                     line = ' '.join(line) + '\n'
                     content[i] = line
 
@@ -350,7 +350,7 @@ def process_T_pose(base_path):
             file = open(bvh_file, 'w')
             file.writelines(content)
             file.close()
-            
+
 
 def make_gesture_dataset(base_path, save_path, preload=False, wavlm_model=None, cfg=None, word2vector=None,
                          device=torch.device('cuda:0'), version='v0'):
@@ -440,20 +440,7 @@ def make_gesture_dataset(base_path, save_path, preload=False, wavlm_model=None, 
                     total_index += 1
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("db_path", type=Path)
-    parser.add_argument("save_path", type=Path)
-    parser.add_argument("wavlm_model_path", type=Path)
-    parser.add_argument("word2vec_model_path", type=Path)
-    parser.add_argument("version", type=str, default="v0")
-    parser.add_argument("step", type=str)
-    parser.add_argument("device", type=str, default="cuda:0")
-    args = parser.parse_args()
-
-    wavlm_model_path = args.wavlm_model_path
-    word2vec_model_path = args.word2vec_model_path
-    
+def main(args):
     assert args.step in ["step1", "step2", "step3", "step4"]
     if args.step == "step1":
         pre_processing(args.db_path)
@@ -466,6 +453,9 @@ def main():
         # wavlm_model, cfg = None, None
         # word2vector = None
         device = torch.device(args.device)
+        wavlm_model_path = args.wavlm_model_path
+        word2vec_model_path = args.word2vec_model_path
+
         wavlm_model, cfg = wavlm_init(wavlm_model_path, device)
         word2vector = load_wordvectors(fname=word2vec_model_path)
 
@@ -479,4 +469,14 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--db_path", type=Path, default="../dataset/BEAT/train/")
+    parser.add_argument("--save_path", type=Path, default="../dataset/BEAT/processed/")
+    parser.add_argument("--wavlm_model_path", type=Path, default="./WavLM/WavLM-Large.pt")
+    parser.add_argument("--word2vec_model_path", type=Path, default="../mydiffusion_beat_twh/crawl-300d-2M.vec")
+    parser.add_argument("--version", type=str, default="v0")
+    parser.add_argument("--step", type=str, default="step1", required=True)
+    parser.add_argument("--device", type=str, default="cuda:0", required=True)
+    args = parser.parse_args()
+
+    main(args)

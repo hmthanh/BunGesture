@@ -15,11 +15,13 @@ from tqdm import tqdm
 from diffusion.resample import create_named_schedule_sampler
 
 import sys
+
 [sys.path.append(i) for i in ['../process']]
 
 
 class TrainLoop:
-    def __init__(self, args, model, diffusion, device, data=None):
+    # def __init__(self, args, model, diffusion, device, data=None):
+    def __init__(self, args, model, diffusion, device, data):
         self.args = args
         self.data = data
         self.model = model
@@ -38,7 +40,7 @@ class TrainLoop:
 
         self.step = 0
         self.resume_step = 0
-        self.global_batch = self.batch_size     # * dist.get_world_size()
+        self.global_batch = self.batch_size  # * dist.get_world_size()
         self.num_steps = args.max_num_steps
         self.save_iters = args.save_iters
         self.n_seed = args.n_seed
@@ -57,13 +59,13 @@ class TrainLoop:
         self.device = device
         if args.audio_feat == "mfcc" or args.audio_feat == 'wavlm':
             self.opt = AdamW([
-                {'params': self.mp_trainer.master_params, 'lr':self.lr, 'weight_decay':self.weight_decay}
+                {'params': self.mp_trainer.master_params, 'lr': self.lr, 'weight_decay': self.weight_decay}
             ])
 
         # if self.resume_step:
         #     self._load_optimizer_state()
-            # Model was resumed, either due to a restart or a checkpoint
-            # being specified at the command line.
+        # Model was resumed, either due to a restart or a checkpoint
+        # being specified at the command line.
 
         self.schedule_sampler_type = 'uniform'
         self.schedule_sampler = create_named_schedule_sampler(self.schedule_sampler_type, diffusion)
@@ -101,13 +103,12 @@ class TrainLoop:
     #         self.opt.load_state_dict(state_dict)
 
     def run_loop(self):
-
         for epoch in range(self.num_steps):
             for batch in tqdm(self.data):
                 if not (not self.lr_anneal_steps or self.step + self.resume_step < self.lr_anneal_steps):
                     break
 
-                cond_ = {'y':{}}
+                cond_ = {'y': {}}
 
                 wavlm, pose_seq, style = batch
                 motion = pose_seq.permute(0, 2, 1).unsqueeze(2).to(self.device, non_blocking=True)
@@ -117,16 +118,15 @@ class TrainLoop:
                 cond_['y']['style'] = style.to(self.device, non_blocking=True)
                 cond_['y']['mask_local'] = self.mask_local_train
                 # cond_['y']['audio'] = wavlm.to(torch.float32).to(self.device, non_blocking=True)      # attention3
-                cond_['y']['audio'] = wavlm.to(torch.float32)[:, self.n_seed:].to(self.device, non_blocking=True)       # attention4
+                cond_['y']['audio'] = wavlm.to(torch.float32)[:, self.n_seed:].to(self.device, non_blocking=True)  # attention4
                 # cond_['y']['audio'] = wavlm.to(torch.float32)[:, self.n_seed:-self.n_seed].to(self.device, non_blocking=True)  # attention5
-                cond_['y']['mask'] = self.mask_train        # [..., self.n_seed:]
+                cond_['y']['mask'] = self.mask_train  # [..., self.n_seed:]
 
                 self.run_step(motion, cond_)
                 if self.step % self.log_interval == 0:
-                    for k,v in logger.get_current().name2val.items():
+                    for k, v in logger.get_current().name2val.items():
                         if k == 'loss':
-                            print('step[{}]: loss[{:0.5f}]'.format(self.step+self.resume_step, v))
-
+                            print('step[{}]: loss[{:0.5f}]'.format(self.step + self.resume_step, v))
 
                 if self.step % self.save_iters == 0:
                     self.save()
@@ -139,7 +139,7 @@ class TrainLoop:
                 break
 
     def run_step(self, batch, cond):
-        self.forward_backward(batch, cond)      # torch.Size([64, 251, 1, 196]) cond['y'].keys() dict_keys(['mask', 'lengths', 'text', 'tokens'])
+        self.forward_backward(batch, cond)  # torch.Size([64, 251, 1, 196]) cond['y'].keys() dict_keys(['mask', 'lengths', 'text', 'tokens'])
         self.mp_trainer.optimize(self.opt)
         self._anneal_lr()
         self.log_step()
@@ -193,10 +193,8 @@ class TrainLoop:
         logger.logkv("step", self.step + self.resume_step)
         logger.logkv("samples", (self.step + self.resume_step + 1) * self.global_batch)
 
-
     def ckpt_file_name(self):
-        return f"model{(self.step+self.resume_step):09d}.pt"
-
+        return f"model{(self.step + self.resume_step):09d}.pt"
 
     def save(self):
         def save_checkpoint(params):
@@ -215,8 +213,8 @@ class TrainLoop:
         save_checkpoint(self.mp_trainer.master_params)
 
         with bf.BlobFile(
-            bf.join(self.save_dir, f"opt{(self.step+self.resume_step):09d}.pt"),
-            "wb",
+                bf.join(self.save_dir, f"opt{(self.step + self.resume_step):09d}.pt"),
+                "wb",
         ) as f:
             torch.save(self.opt.state_dict(), f)
 
